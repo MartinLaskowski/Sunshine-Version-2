@@ -5,6 +5,7 @@ package com.example.android.sunshine.app;
 
 
 // Import statements make other packages, classes or interfaces available to this piece of code (which in turn becomes a new class or interface)
+
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
@@ -14,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -53,14 +55,19 @@ public class MainActivity extends ActionBarActivity { // We add an ActionBar to 
     }
 
 
+
+
     // defines a placeholder fragment (class) containing a simple view that is instantiated above in the onCreate method
     public static class PlaceholderFragment extends Fragment {
 
-        public PlaceholderFragment() {
-        // nothing defined here
+        public PlaceholderFragment()  // nothing defined here
         }
 
-        @Override //
+        // instantiates an ArrayAdapter for strings called ForecastAdapter, which gets called further down below
+        private ArrayAdapter<String> ForecastAdapter;
+
+
+        @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) { // onCreateView creates and returns the view hierarchy associated with the fragment
             View rootView = inflater.inflate( // creates a new View object called rootView that is inflated from fragment_main.xml
                     R.layout.fragment_main, // parser ... XML dom node containing the description of the view hierarchy
@@ -83,8 +90,14 @@ public class MainActivity extends ActionBarActivity { // We add an ActionBar to 
             );
 
 
-            ArrayAdapter<String> ForecastAdapter = new ArrayAdapter<String>(getActivity(), R.layout.list_item_forecast, R.id.list_item_forecast_textview, weekForecast); // (context, ID of layout to populate, ID of TextView to take shape parameters from, the data array)
+            // (calls) populates that ForecastAdapter instantiated above with that List of Strings called weeForecast that's full of our dummy data right now
+            ForecastAdapter = new ArrayAdapter<String>(getActivity(), R.layout.list_item_forecast, R.id.list_item_forecast_textview, weekForecast); // (context, ID of layout to populate, ID of TextView to take shape parameters from, the data array)
 
+            // finds (by ID) the ListView we want to link to our new ArrayAdapter created above
+            ListView listView = (ListView) rootView.findViewById(R.id.list_view_forecast);
+
+            // sets our ArrayAdapter onto the listView!!!
+            listView.setAdapter(ForecastAdapter);
 
             return rootView;
         }

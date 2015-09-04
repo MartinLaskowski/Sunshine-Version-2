@@ -2,14 +2,21 @@
 package com.example.android.sunshine.app;
 
 // Import statements make other packages, classes or interfaces available to this piece of code (which in turn becomes a new class or interface)
-import android.support.v4.app.Fragment; // extends java.lang.Object
-import android.support.v7.app.ActionBarActivity; // (DEPRECATED - use AppCompatActivity) extends AppCompatActivity < android.support.v4.app.FragmentActivity < android.app.Activity
-import android.os.Bundle; // extends android.os.BaseBundle < java.lang.Object  "A mapping from String values to various Parcelable types"
-import android.view.LayoutInflater; // extends java.lang.Object  Instantiates a layout XML file into its corresponding View objects. It is never used directly
-import android.view.Menu; // Interface for managing the items in a menu
-import android.view.MenuItem; // Interface for direct access to a previously created menu item
-import android.view.View; // extends java.lang.Object  represents the basic building block for user interface components
-import android.view.ViewGroup; // extends android.view.View  A ViewGroup is a special view that can contain other views (called children.)
+
+
+// Import statements make other packages, classes or interfaces available to this piece of code (which in turn becomes a new class or interface)
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBarActivity;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class MainActivity extends ActionBarActivity { // We add an ActionBar to our activity (from API 7 or higher) by extending the now deprecated ActionBarActivity and setting the activity theme to Theme.AppCompat or similar.
 
@@ -57,6 +64,22 @@ public class MainActivity extends ActionBarActivity { // We add an ActionBar to 
                     R.layout.fragment_main, // parser ... XML dom node containing the description of the view hierarchy
                     container, // root ... Optional view to be the parent of the generated hierarchy (if attachToRoot is true), or else simply an object that provides a set of LayoutParams values for root of the returned hierarchy (if attachToRoot is false.)
                     false); // attachToRoot	... Whether the inflated hierarchy should be attached to the root parameter? If false, root is only used to create the correct subclass of LayoutParams for the root view in the XML.
+
+            // creates an array of manually entered strings called fakeForecastDataArray
+            String[] fakeForecastDataArray = {
+                    "Today - Sunny - 88 / 63",
+                    "Tomorrow - Foggy - 70 / 46",
+                    "Weds - Cloudy - 72 / 63",
+                    "Thurs - Rainy - 64 / 51",
+                    "Fri - Foggy - 70 / 46",
+                    "Sat - Sunny - 76 - 68"
+            };
+
+            // creates a new List object for storing Strings called weekForecast. This object then is made equal to (populated by) ...
+            List<String> weekForecast = new ArrayList<String>( // ... an ArrayList of Strings that contains ...
+                    Arrays.asList(fakeForecastDataArray) // ... our fakeForecastDataArray as a list
+            );
+
             return rootView;
         }
     }

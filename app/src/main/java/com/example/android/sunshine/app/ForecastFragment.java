@@ -68,12 +68,7 @@ public class ForecastFragment extends Fragment {
     //  Now extend AsyncTask to create a class that fetches weather data from the web
     public class FetchWeatherTask extends AsyncTask<String, Void, String> {
 
-    // Network snippet below is from https://gist.github.com/udacityandroid/d6a7bb21904046a91695
-
-        HttpURLConnection urlConnection = null; // These must be declared outside the try/catch ...
-        BufferedReader reader = null; // ... so that they can be closed in the 'finally' block
-
-        String forecastJsonStr = null; // Will contain the raw JSON response as a string.
+        private final String LOG_TAG = FetchWeatherTask.class.getSimpleName();
 
         // creates a method called String on a background thread and publishes it, when assembled,
         // to our UI thread.
@@ -83,6 +78,11 @@ public class ForecastFragment extends Fragment {
         // be passed as an array of of Strings OR as a sequence of parameters.
         protected String doInBackground(String... params) {
 
+            // Network snippet below is from https://gist.github.com/udacityandroid/d6a7bb21904046a91695
+            HttpURLConnection urlConnection = null; // These must be declared outside the try/catch ...
+            BufferedReader reader = null; // ... so that they can be closed in the 'finally' block
+
+            String forecastJsonStr = null; // Will contain the raw JSON response as a string.
 
             try {
                 // Construct the URL for the OpenWeatherMap query
@@ -118,7 +118,7 @@ public class ForecastFragment extends Fragment {
                 }
                 forecastJsonStr = buffer.toString();
             } catch (IOException e) {
-                Log.e("ForecastFragment", "Error ", e);
+                Log.e(LOG_TAG, "Error ", e);
                 // If the code didn't successfully get the weather data, there's no point in attemping
                 // to parse it.
                 return null;
@@ -130,7 +130,7 @@ public class ForecastFragment extends Fragment {
                     try {
                         reader.close();
                     } catch (final IOException e) {
-                        Log.e("ForecastFragment", "Error closing stream", e);
+                        Log.e(LOG_TAG, "Error closing stream", e);
                     }
                 }
             }

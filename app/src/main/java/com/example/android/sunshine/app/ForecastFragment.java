@@ -5,6 +5,9 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -28,6 +31,34 @@ public class ForecastFragment extends Fragment {
     public ForecastFragment() { // nothing defined here
     }
 
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState); //'super' calls parent constructors or methods, in this case the method .onCreate of parent ForecastFragment
+        setHasOptionsMenu(true); /// this must be true in order for this fragment to handle menu events
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.forecastfragment, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) { // handler for when an action bar item is clicked. The action bar automatically handles clicks on the Home/Up button so long as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId(); // gets the id of the selected item
+
+        //noinspection SimplifiableIfStatement  // <-- this comment is system generated and means 'careful: this could be simplified to "return id == R.id.action_settings" unless you put something in the 'if' later, e.g. launch a Settings activity'
+        if (id == R.id.action_refresh) {  // 'action-settings' is the name of the first menu item in our menu
+            return true;
+        }
+        // the can presumably be other if statements here testing for other menu items we create
+
+        return super.onOptionsItemSelected(item); // return the id of the item selected
+    }
+
+
+
     // instantiates an ArrayAdapter<for  Strings> called ForecastAdapter, which gets called below
     private ArrayAdapter<String> ForecastAdapter;
 
@@ -37,6 +68,7 @@ public class ForecastFragment extends Fragment {
                 R.layout.fragment_main, // parser ... XML dom node containing the description of the view hierarchy
                 container, // root ... Optional view to be the parent of the generated hierarchy (if attachToRoot is true), or else simply an object that provides a set of LayoutParams values for root of the returned hierarchy (if attachToRoot is false.)
                 false); // attachToRoot	... Whether the inflated hierarchy should be attached to the root parameter? If false, root is only used to create the correct subclass of LayoutParams for the root view in the XML.
+
 
         // creates an array of manually entered strings called fakeForecastDataArray
         String[] fakeForecastDataArray = {
@@ -60,9 +92,8 @@ public class ForecastFragment extends Fragment {
         // sets our ArrayAdapter onto the listView!!!
         listView.setAdapter(ForecastAdapter);
 
-        return rootView; // returns the completed, populated rootView
+    return rootView; // returns the completed, populated rootView
     }
-
 
 
     //  Now extend AsyncTask to create a class that fetches weather data from the web
@@ -134,11 +165,8 @@ public class ForecastFragment extends Fragment {
                     }
                 }
             }
-
             return null;
         }
-
-
 
     }
 }

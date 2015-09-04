@@ -13,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,7 +40,7 @@ public class MainActivity extends ActionBarActivity { // We add an ActionBar to 
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) { // handler for when an action bar item  is clicked. The action bar automatically handles clicks on the Home/Up button so long as you specify a parent activity in AndroidManifest.xml.
+    public boolean onOptionsItemSelected(MenuItem item) { // handler for when an action bar item is clicked. The action bar automatically handles clicks on the Home/Up button so long as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId(); // gets the id of the selected item
 
         //noinspection SimplifiableIfStatement  // <-- this comment is system generated and means 'careful: this could be simplified to "return id == R.id.action_settings" unless you put something in the 'if' later, e.g. launch a Settings activity'
@@ -50,6 +51,7 @@ public class MainActivity extends ActionBarActivity { // We add an ActionBar to 
 
         return super.onOptionsItemSelected(item); // return the id of the item selected
     }
+
 
     // defines a placeholder fragment (class) containing a simple view that is instantiated above in the onCreate method
     public static class PlaceholderFragment extends Fragment {
@@ -79,6 +81,10 @@ public class MainActivity extends ActionBarActivity { // We add an ActionBar to 
             List<String> weekForecast = new ArrayList<String>( // ... an ArrayList of Strings that contains ...
                     Arrays.asList(fakeForecastDataArray) // ... our fakeForecastDataArray as a list
             );
+
+
+            ArrayAdapter<String> ForecastAdapter = new ArrayAdapter<String>(getActivity(), R.layout.list_item_forecast, R.id.list_item_forecast_textview, weekForecast); // (context, ID of layout to populate, ID of TextView to take shape parameters from, the data array)
+
 
             return rootView;
         }

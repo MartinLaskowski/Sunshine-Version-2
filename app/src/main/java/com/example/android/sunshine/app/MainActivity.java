@@ -60,7 +60,7 @@ public class MainActivity extends ActionBarActivity { // We add an ActionBar to 
     // defines a placeholder fragment (class) containing a simple view that is instantiated above in the onCreate method
     public static class PlaceholderFragment extends Fragment {
 
-        public PlaceholderFragment()  // nothing defined here
+        public PlaceholderFragment() { // nothing defined here
         }
 
         // instantiates an ArrayAdapter for strings called ForecastAdapter, which gets called further down below

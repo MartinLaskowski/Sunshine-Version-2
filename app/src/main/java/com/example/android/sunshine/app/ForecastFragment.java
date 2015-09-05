@@ -1,5 +1,6 @@
 package com.example.android.sunshine.app;
 
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -51,7 +52,7 @@ public class ForecastFragment extends Fragment {
         //noinspection SimplifiableIfStatement  // <-- this comment is system generated and means 'careful: this could be simplified to "return id == R.id.action_settings" unless you put something in the 'if' later, e.g. launch a Settings activity'
         if (id == R.id.action_refresh) {  // 'action-settings' is the name of the first menu item in our menu
             FetchWeatherTask weatherTask = new FetchWeatherTask(); // instantiates FetchWeatherTask to a new instance called weatherTask
-            weatherTask.execute(); // executes the task instance
+            weatherTask.execute("94043"); // executes the task instance
             return true;
         }
         // the can presumably be other if statements here testing for other menu items we create
@@ -98,6 +99,7 @@ public class ForecastFragment extends Fragment {
     }
 
 
+
     //  Now extend AsyncTask to create a class that fetches weather data from the web
     public class FetchWeatherTask extends AsyncTask<String, Void, String> {
 
@@ -109,7 +111,14 @@ public class ForecastFragment extends Fragment {
         // and mean that the method can take any number of objects of type String. Varargs have to
         // be in the final argument position. Also, the 'params' means that the final argument may
         // be passed as an array of of Strings OR as a sequence of parameters.
+
+
+
         protected String doInBackground(String... params) {
+
+
+
+
 
             // Network snippet below is from https://gist.github.com/udacityandroid/d6a7bb21904046a91695
             HttpURLConnection urlConnection = null; // These must be declared outside the try/catch ...
@@ -117,11 +126,38 @@ public class ForecastFragment extends Fragment {
 
             String forecastJsonStr = null; // Will contain the raw JSON response as a string.
 
+            // setting up some variables for our Uri.Builder
+            String format = "json";
+            String units = "metric";
+            int numDays = 7;
+
             try {
                 // Construct the URL for the OpenWeatherMap query
                 // Possible parameters are avaiable at OWM's forecast API page, at
                 // http://openweathermap.org/API#forecast
-                URL url = new URL("http://api.openweathermap.org/data/2.5/forecast/daily?q=94043&mode=json&units=metric&cnt=7");
+
+                final String FORECAST_BASE_URL =
+                        "http://api.openweathermap.org/data/2.5/forecast/daily?";
+
+                final String QUERY_PARAM = "q";
+                final String FORMAT_PARAM = "mode";
+                final String UNITS_PARAM = "units";
+                final String DAYS_PARAM = "cnt";
+
+
+                Uri builtUri = Uri.parse(FORECAST_BASE_URL).buildUpon()
+                        .appendQueryParameter(QUERY_PARAM, params[0])
+                        .appendQueryParameter(FORMAT_PARAM, format)
+                        .appendQueryParameter(UNITS_PARAM, units)
+                        .appendQueryParameter(DAYS_PARAM, Integer.toString(numDays))
+                        .build();
+
+                URL url = new URL (builtUri.toString());
+
+                Log.v(LOG_TAG, "Built URI is:" + url);
+
+
+
 
                 // Create the request to OpenWeatherMap, and open the connection
                 urlConnection = (HttpURLConnection) url.openConnection();

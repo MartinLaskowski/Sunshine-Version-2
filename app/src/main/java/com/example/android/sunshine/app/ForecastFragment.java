@@ -50,6 +50,8 @@ public class ForecastFragment extends Fragment {
 
         //noinspection SimplifiableIfStatement  // <-- this comment is system generated and means 'careful: this could be simplified to "return id == R.id.action_settings" unless you put something in the 'if' later, e.g. launch a Settings activity'
         if (id == R.id.action_refresh) {  // 'action-settings' is the name of the first menu item in our menu
+            FetchWeatherTask weatherTask = new FetchWeatherTask(); // instantiates FetchWeatherTask to a new instance called weatherTask
+            weatherTask.execute(); // executes the task instance
             return true;
         }
         // the can presumably be other if statements here testing for other menu items we create

@@ -36,7 +36,7 @@ import java.util.List;
 public class ForecastFragment extends Fragment {
 
     // instantiates an ArrayAdapter<for  Strings> called mForecastAdapter, which gets called below
-    private ArrayAdapter<String> mForecastAdapter;
+    public ArrayAdapter<String> mForecastAdapter;
 
 
     public ForecastFragment() { // nothing defined here
@@ -221,7 +221,7 @@ public class ForecastFragment extends Fragment {
         // be in the final argument position. Also, the 'params' means that the final argument may
         // be passed as an array of of Strings OR as a sequence of parameters.
         @Override
-        protected String[] doInBackground(String... params) {
+        public String[] doInBackground(String... params) {
 
             // If there's no zip code, there's nothing to look up.  Verify size of params.
             if (params.length == 0) {
@@ -294,6 +294,7 @@ public class ForecastFragment extends Fragment {
                     return null;
                 }
                 forecastJsonStr = buffer.toString(); // our ready data!!
+
                 Log.v(LOG_TAG, "Forecast JSON String: " + forecastJsonStr); // logs our new data
 
             } catch (IOException e) {
@@ -325,8 +326,17 @@ public class ForecastFragment extends Fragment {
                 e.printStackTrace();
             }
             // This will only happen if there was an error getting or parsing the forecast.
-
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(String[] result) {
+            if ( result != null) {
+                mForecastAdapter.clear();
+                for (String dayForecastStr : result) {
+                    mForecastAdapter.add(dayForecastStr);
+                }
+            }
         }
     }
 }

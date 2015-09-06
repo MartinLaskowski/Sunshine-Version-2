@@ -205,9 +205,9 @@ public class ForecastFragment extends Fragment {
                 resultStrs[i] = day + " - " + description + " - " + highAndLow;
             }
 
-            for (String s : resultStrs) {
-                Log.v(LOG_TAG, "Forecast entry: " + s);
-            }
+//            for (String s : resultStrs) {
+//                Log.v(LOG_TAG, "Forecast entry: " + s);
+//            }
             return resultStrs;
 
         }
@@ -263,7 +263,7 @@ public class ForecastFragment extends Fragment {
                 // commits the built URL to a new URL variable called URL
                 URL url = new URL (builtUri.toString());
 
-                Log.v(LOG_TAG, "Built URI is:" + url); // logs the URL string we built
+//                Log.v(LOG_TAG, "Built URI is:" + url); // logs the URL string we built
 
 
 
@@ -295,7 +295,7 @@ public class ForecastFragment extends Fragment {
                 }
                 forecastJsonStr = buffer.toString(); // our ready data!!
 
-                Log.v(LOG_TAG, "Forecast JSON String: " + forecastJsonStr); // logs our new data
+//                Log.v(LOG_TAG, "Forecast JSON String: " + forecastJsonStr); // logs our new data
 
             } catch (IOException e) {
                 Log.e(LOG_TAG, "Error ", e);

@@ -30,23 +30,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-
-
-// defines a fragment (class) called ForecastFragment containing a simple view that is instantiated above in the onCreate method
 public class ForecastFragment extends Fragment {
 
-    // instantiates an ArrayAdapter<for  Strings> called mForecastAdapter, which gets called below
     public ArrayAdapter<String> mForecastAdapter;
 
-
-    public ForecastFragment() { // nothing defined here
+    public ForecastFragment() { // empty definition
     }
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState); //'super' calls parent constructors or methods, in this case the method .onCreate of parent ForecastFragment
-        setHasOptionsMenu(true); /// this must be true in order for this fragment to handle menu events
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true); // Must be true for this fragment to handle menu events
     }
 
     @Override
@@ -54,26 +48,26 @@ public class ForecastFragment extends Fragment {
         inflater.inflate(R.menu.forecastfragment, menu);
     }
 
+    // Handle action bar item clicks. The Action bar automatically handles clicks on the Home/Up
+    // button as long as you specify a parent activity in AndroidManifest.xml.
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) { // handler for when an action bar item is clicked. The action bar automatically handles clicks on the Home/Up button so long as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId(); // gets the id of the selected item
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement  // <-- this comment is system generated and means 'careful: this could be simplified to "return id == R.id.action_settings" unless you put something in the 'if' later, e.g. launch a Settings activity'
-        if (id == R.id.action_refresh) {  // 'action-settings' is the name of the first menu item in our menu
-            FetchWeatherTask weatherTask = new FetchWeatherTask(); // instantiates FetchWeatherTask to a new instance called weatherTask
-            weatherTask.execute("94043"); // executes the task instance
+        if (id == R.id.action_refresh) {
+            FetchWeatherTask weatherTask = new FetchWeatherTask();
+            weatherTask.execute("94043");
             return true;
         }
-        // there can presumably be other If statements here testing for any other menu items we create
-        return super.onOptionsItemSelected(item); // return the id of the item selected
+
+        return super.onOptionsItemSelected(item);
     }
 
-
-    @Override // onCreateView creates and returns the view hierarchy associated with the fragment
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    @Override // Creates and returns the view hierarchy associated with the fragment
+    public View onCreateView(
+            LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         // TODO delete this fake data generator when network data call works
-        // creates an array of manually entered strings called fakeForecastDataArray
         String[] fakeForecastDataArray = {
                 "Today - Sunny - 88 / 63",
                 "Tomorrow - Foggy - 70 / 46",
@@ -83,42 +77,33 @@ public class ForecastFragment extends Fragment {
                 "Sat - Sunny - 76 - 68"
         };
 
-        // creates a new List object for storing Strings called weekForecast. This object then is made equal to (populated by) ...
-        List<String> weekForecast = new ArrayList<String>( // ... an ArrayList of Strings that contains ...
-                Arrays.asList(fakeForecastDataArray) // ... our fakeForecastDataArray as a list
-        );
+        List<String> weekForecast = new ArrayList<String>(Arrays.asList(fakeForecastDataArray));
 
-        // (calls) populates that mForecastAdapter instantiated above with our List of Strings called weekForecast that's full of our dummy data right now
-        mForecastAdapter =
+        mForecastAdapter = // Instantiates mForecastAdapter and populates with our weekForecast
                 new ArrayAdapter<String>(
                         getActivity(), // The current context (this here activity)
                         R.layout.list_item_forecast, // The ID of the layout
                         R.id.list_item_forecast_textview, // The ID of the textView to populate
                         weekForecast); // the data array
 
-        View rootView = inflater.inflate( // creates a new View object called rootView that is inflated from fragment_main.xml
-                R.layout.fragment_main, // parser ... XML dom node containing the description of the view hierarchy
-                container, // root ... Optional view to be the parent of the generated hierarchy (if attachToRoot is true), or else simply an object that provides a set of LayoutParams values for root of the returned hierarchy (if attachToRoot is false.)
-                false); // attachToRoot	... Whether the inflated hierarchy should be attached to the root parameter? If false, root is only used to create the correct subclass of LayoutParams for the root view in the XML.
+        View rootView = inflater.inflate(
+                R.layout.fragment_main, // parses to the XML dom node describing view hierarchy
+                container, // root: parent of generated hierarchy if attachToRoot = true, else ..
+                false); // attachToRoot: .. if false, container just subclasses LayoutParams for XML
 
-        // finds (by ID) the ListView we want to link to our new ArrayAdapter created above
         ListView listView = (ListView) rootView.findViewById(R.id.list_view_forecast);
 
-        // sets our ArrayAdapter onto the listView!!!
-        listView.setAdapter(mForecastAdapter);
+        listView.setAdapter(mForecastAdapter); // sets our ArrayAdapter onto the listView!!!
 
     return rootView; // returns the completed, populated rootView
     }
 
-
-    //  Fetch and manipulate weather data from the Open Weather Map
     public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
 
-        // define a Log Tag matched to the parent class's name (making it rename safe)
         private final String LOG_TAG = FetchWeatherTask.class.getSimpleName();
 
         // The date/time conversion code is going to be moved outside the asynctask later,
-        //so for convenience we're breaking it out into its own method now.
+        // so for convenience we're breaking it out into its own method now.
         private String getReadableDateString(long time){
             // Because the API returns a unix timestamp (measured in seconds),
             // it must be converted to milliseconds in order to be converted to valid date.
@@ -126,7 +111,7 @@ public class ForecastFragment extends Fragment {
             return shortenedDateFormat.format(time);
         }
 
-        //Prepare the weather high/lows for presentation.
+        // Prepare the weather high/lows for presentation.
         private String formatHighLows(double high, double low) {
             // For presentation, assume the user doesn't care about tenths of a degree.
             long roundedHigh = Math.round(high);
@@ -135,16 +120,14 @@ public class ForecastFragment extends Fragment {
             String highLowStr = roundedHigh + "/" + roundedLow;
             return highLowStr;
         }
-        /*
-        Take the String representing the complete forecast in JSON Format and
-        pull out the data we need to construct the Strings needed for the wireframes.
-        Fortunately parsing is easy:  constructor takes the JSON string and converts it
-        into an Object hierarchy for us.
-        */
+
+        // Take the String representing the complete forecast in JSON Format and pull out the data
+        // we need to construct the Strings needed for the wireframes. Fortunately parsing is easy:
+        // constructor takes the JSON string and converts it into an Object hierarchy for us.
         private String[] getWeatherDataFromJson(String forecastJsonStr, int numDays)
                 throws JSONException {
 
-            // These are the names of the JSON objects that need to be extracted.
+            // Names of JSON objects that need to be extracted.
             final String OWM_LIST = "list";
             final String OWM_WEATHER = "weather";
             final String OWM_TEMPERATURE = "temp";
@@ -155,23 +138,17 @@ public class ForecastFragment extends Fragment {
             JSONObject forecastJson = new JSONObject(forecastJsonStr);
             JSONArray weatherArray = forecastJson.getJSONArray(OWM_LIST);
 
-            // OWM returns daily forecasts based upon the local time of the city that is being
-            // asked for, which means that we need to know the GMT offset to translate this data
-            // properly.
-
-            // Since this data is also sent in-order and the first day is always the
-            // current day, we're going to take advantage of that to get a nice
-            // normalized UTC date for all of our weather.
-
+            // OWM returns daily forecasts based upon the local time of the requested city, which
+            // means we need to know the GMT offset to translate this data properly. Since this data
+            // is also sent in-order and the first day is always the current day, we're going to
+            // take advantage of that to get a nice normalized UTC date for all of our weather.
             Time dayTime = new Time();
             dayTime.setToNow();
 
             // we start at the day returned by local time. Otherwise this is a mess.
             int julianStartDay = Time.getJulianDay(System.currentTimeMillis(), dayTime.gmtoff);
 
-
-            // now we work exclusively in UTC
-            dayTime = new Time();
+            dayTime = new Time();       // now we work exclusively in UTC
 
             String[] resultStrs = new String[numDays];
             for(int i = 0; i < weatherArray.length(); i++) {
@@ -183,20 +160,20 @@ public class ForecastFragment extends Fragment {
                 // Get the JSON object representing the day
                 JSONObject dayForecast = weatherArray.getJSONObject(i);
 
-                // The date/time is returned as a long.  We need to convert that
-                // into something human-readable, since most people won't read "1400356800" as
-                // "this saturday".
+                // The date/time is returned as a long. We now convert it into something human-
+                // readable, since most people won't read "1400356800" as "this saturday"
                 long dateTime;
+
                 // Cheating to convert this to UTC time, which is what we want anyhow
                 dateTime = dayTime.setJulianDay(julianStartDay+i);
                 day = getReadableDateString(dateTime);
 
-                // description is in a child array called "weather", which is 1 element long.
+                // description is in a child array called "weather" which is 1 element long
                 JSONObject weatherObject = dayForecast.getJSONArray(OWM_WEATHER).getJSONObject(0);
                 description = weatherObject.getString(OWM_DESCRIPTION);
 
                 // Temperatures are in a child object called "temp".  Try not to name variables
-                // "temp" when working with temperature.  It confuses everybody.
+                // "temp" when working with temperature. It confuses everybody
                 JSONObject temperatureObject = dayForecast.getJSONObject(OWM_TEMPERATURE);
                 double high = temperatureObject.getDouble(OWM_MAX);
                 double low = temperatureObject.getDouble(OWM_MIN);
@@ -204,45 +181,33 @@ public class ForecastFragment extends Fragment {
                 highAndLow = formatHighLows(high, low);
                 resultStrs[i] = day + " - " + description + " - " + highAndLow;
             }
-
-//            for (String s : resultStrs) {
-//                Log.v(LOG_TAG, "Forecast entry: " + s);
-//            }
+//  for (String s : resultStrs) { Log.v(LOG_TAG, "Forecast entry: " + s); }
             return resultStrs;
-
         }
 
-
-
-        // creates a method called String on a background thread and publishes it, when assembled,
-        // to our UI thread.
-        // incidentally, the '...' ellipses passed in the method signature are called Java varargs
-        // and mean that the method can take any number of objects of type String. Varargs have to
-        // be in the final argument position. Also, the 'params' means that the final argument may
-        // be passed as an array of of Strings OR as a sequence of parameters.
+        // Create an String[] on a background thread and publish it when assembled to our UI thread.
+        // The '...' ellipses passed in the method signature are varargs and mean the method can
+        // take any number of objects of type String. Varargs must be in the final argument position
+        // and the 'params' means that the final argument may be passed as an array of Strings or as
+        // a sequence of parameters.
         @Override
         public String[] doInBackground(String... params) {
 
-            // If there's no zip code, there's nothing to look up.  Verify size of params.
-            if (params.length == 0) {
+            if (params.length == 0) { // No zip code, nothing to look up - verify size of params
                 return null;
             }
 
-            // Network snippet below is from https://gist.github.com/udacityandroid/d6a7bb21904046a91695
-            HttpURLConnection urlConnection = null; // These must be declared outside the try/catch ...
-            BufferedReader reader = null; // ... so that they can be closed in the 'finally' block
+            HttpURLConnection urlConnection = null; // Declaring these here outside the try/catch ..
+            BufferedReader reader = null; // ... so they can be closed in the 'finally' block
 
-            String forecastJsonStr = null; // Will contain the raw JSON response as a string.
+            String forecastJsonStr = null; // Will contain the raw JSON response as a string
 
             // Set up variables for our Uri.Builder
             String format = "json";
             String units = "metric";
             int numDays = 7;
 
-            try {
-                // Construct the URL for the OpenWeatherMap query
-                // Possible parameters are avaiable at OWM's forecast API page, at
-                // http://openweathermap.org/API#forecast
+            try { // Construct OWM URL query. Possible params at openweathermap.org/API#forecast
                 final String FORECAST_BASE_URL = // sets the base URL to a String
                         "http://api.openweathermap.org/data/2.5/forecast/daily?";
 
@@ -262,10 +227,7 @@ public class ForecastFragment extends Fragment {
 
                 // commits the built URL to a new URL variable called URL
                 URL url = new URL (builtUri.toString());
-
-//                Log.v(LOG_TAG, "Built URI is:" + url); // logs the URL string we built
-
-
+//  Log.v(LOG_TAG, "Built URI is:" + url); // logs the URL string we built
 
                 // Create the request to OpenWeatherMap, and open the connection
                 urlConnection = (HttpURLConnection) url.openConnection();
@@ -274,45 +236,41 @@ public class ForecastFragment extends Fragment {
 
                 // Read the input stream into a String
                 InputStream inputStream = urlConnection.getInputStream();
-                StringBuffer buffer = new StringBuffer(); // this buffer is where our inputStream data will be added line by line below, by the while statement
-                if (inputStream == null) { // if the URL returned an empty string, quit doInBackGround() and return null
-                    // Nothing to do.
+                StringBuffer buffer = new StringBuffer(); // data added line-by-line by while below
+                if (inputStream == null) { // if URL returned empty string, quit and return null
                     return null;
                 }
-                reader = new BufferedReader(new InputStreamReader(inputStream)); // puts the content of the inputStream into variable 'reader'
+
+                // puts the content of the inputStream into variable 'reader'
+                reader = new BufferedReader(new InputStreamReader(inputStream));
 
                 String line;
                 while ((line = reader.readLine()) != null) {
                     // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
                     // But it does make debugging a *lot* easier if you print out the completed
-                    // buffer for debugging.
+                    // buffer for debugging
                     buffer.append(line + "\n");
                 }
 
-                if (buffer.length() == 0) {
-                    // Stream was empty.  No point in parsing.
+                if (buffer.length() == 0) { // If stream is empty, no point in parsing
                     return null;
                 }
                 forecastJsonStr = buffer.toString(); // our ready data!!
+//  Log.v(LOG_TAG, "Forecast JSON String: " + forecastJsonStr); // logs our new data
 
-//                Log.v(LOG_TAG, "Forecast JSON String: " + forecastJsonStr); // logs our new data
-
-            } catch (IOException e) {
+            } catch (IOException e) { // If weather data fetch failed there's no point in parsing
                 Log.e(LOG_TAG, "Error ", e);
-                // If the code didn't successfully get the weather data, there's no point in attemping
-                // to parse it.
                 return null;
             }
 
-            // kills the connection
-            finally {
+            finally { // kill the connection
                 if (urlConnection != null) {
                     urlConnection.disconnect();
                 }
-                if (reader != null) {
+                if (reader != null) { // close the reader
                     try {
                         reader.close();
-                    } catch (final IOException e) {
+                    } catch (final IOException e) { // log errors in closing stream
                         Log.e(LOG_TAG, "Error closing stream", e);
                     }
                 }
@@ -321,15 +279,14 @@ public class ForecastFragment extends Fragment {
             try {
                 return getWeatherDataFromJson(forecastJsonStr, numDays);
             }
-            catch (JSONException e) {
+            catch (JSONException e) { // Log errors getting or parsing the forecast
                 Log.e(LOG_TAG, e.getMessage(), e);
                 e.printStackTrace();
             }
-            // This will only happen if there was an error getting or parsing the forecast.
             return null;
         }
 
-        @Override
+        @Override // Once data is got and parsed, clear mForecastAdapter and add data to it 
         protected void onPostExecute(String[] result) {
             if ( result != null) {
                 mForecastAdapter.clear();

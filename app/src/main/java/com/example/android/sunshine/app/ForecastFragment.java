@@ -102,12 +102,18 @@ public class ForecastFragment extends Fragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+
+                String dailyForecastSnippet = mForecastAdapter.getItem(position);
+
                 // create intent that starts DetailActivity
-                Intent launchDetailActivityIntent = new Intent(getActivity(), DetailActivity.class);
+                Intent launchDetailActivityIntent = new Intent(getActivity(), DetailActivity.class)
+                        .putExtra(Intent.EXTRA_TEXT, dailyForecastSnippet);
+
                 startActivity(launchDetailActivityIntent);
+
+//                Toast.makeText(getActivity(), dailyForecastSnippet, Toast.LENGTH_SHORT).show();
             }
         });
-
     return rootView; // returns the completed, populated rootView
     }
 

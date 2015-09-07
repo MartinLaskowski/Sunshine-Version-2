@@ -1,9 +1,15 @@
 package com.example.android.sunshine.app;
 
 import android.support.v7.app.ActionBarActivity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
 
 public class DetailActivity extends ActionBarActivity {
 
@@ -11,8 +17,10 @@ public class DetailActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
+        if (savedInstanceState == null) getSupportFragmentManager().beginTransaction()
+                .add(R.id.container, new DetailFragment())
+                .commit();
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -34,5 +42,29 @@ public class DetailActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    // a placeholder fragment containing a simple view
+    public static class DetailFragment extends Fragment {
+
+        public DetailFragment() {
+        }
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+
+            View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
+
+            Intent intent = getActivity().getIntent(); // get the intent that started this activity
+
+            if (intent != null && intent.hasExtra(Intent.EXTRA_TEXT)) {
+                String dailyForecastStr = intent.getStringExtra(Intent.EXTRA_TEXT);
+                ((TextView) rootView.findViewById(R.id.detail_Text)) // find the textView by ID
+                        .setText(dailyForecastStr); // set the textView's content to be 'message'
+            }
+
+        return rootView;
+        }
     }
 }

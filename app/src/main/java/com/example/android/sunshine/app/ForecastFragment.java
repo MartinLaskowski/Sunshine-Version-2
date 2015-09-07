@@ -1,5 +1,6 @@
 package com.example.android.sunshine.app;
 
+import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -12,8 +13,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -91,10 +94,23 @@ public class ForecastFragment extends Fragment {
                 container, // root: parent of generated hierarchy if attachToRoot = true, else ..
                 false); // attachToRoot: .. if false, container just subclasses LayoutParams for XML
 
-        ListView listView = (ListView) rootView.findViewById(R.id.list_view_forecast);
+        final ListView listView = (ListView) rootView.findViewById(R.id.list_view_forecast);
 
         listView.setAdapter(mForecastAdapter); // sets our ArrayAdapter onto the listView!!!
 
+        // add list item click listener
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+
+                // add a toast
+                Context context = getActivity();
+                String weatherSnippet = listView.getItemAtPosition(position).toString();
+                int duration = Toast.LENGTH_SHORT;
+
+                Toast.makeText(context, weatherSnippet, duration).show();
+            }
+        });
     return rootView; // returns the completed, populated rootView
     }
 
@@ -286,7 +302,7 @@ public class ForecastFragment extends Fragment {
             return null;
         }
 
-        @Override // Once data is got and parsed, clear mForecastAdapter and add data to it 
+        @Override // Once data is got and parsed, clear mForecastAdapter and add data to it
         protected void onPostExecute(String[] result) {
             if ( result != null) {
                 mForecastAdapter.clear();

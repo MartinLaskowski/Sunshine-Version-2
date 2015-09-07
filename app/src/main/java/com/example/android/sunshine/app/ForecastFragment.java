@@ -1,6 +1,5 @@
 package com.example.android.sunshine.app;
 
-import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -104,11 +103,9 @@ public class ForecastFragment extends Fragment {
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
 
                 // add a toast
-                Context context = getActivity();
-                String weatherSnippet = listView.getItemAtPosition(position).toString();
-                int duration = Toast.LENGTH_SHORT;
 
-                Toast.makeText(context, weatherSnippet, duration).show();
+                String dailyForecastSnippet = mForecastAdapter.getItem(position).toString();
+                Toast.makeText(getActivity(), dailyForecastSnippet, Toast.LENGTH_SHORT).show();
             }
         });
     return rootView; // returns the completed, populated rootView

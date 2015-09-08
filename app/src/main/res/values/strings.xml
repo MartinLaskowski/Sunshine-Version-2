@@ -13,10 +13,10 @@
     <!-- Preferences -->
     <string name="pref_location_label">Location</string>
     <string name="pref_location_key" translatable="false">location</string>
-    <string name="pref_location_value" translatable="false">94043</string>
-
+    <string name="pref_location_value" translatable="false">90210</string>
 
 
     <string name="hello_world">Hello World!</string>
+    <string name="pref_location_default">94034</string>
 
 </resources>

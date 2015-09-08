@@ -2,9 +2,21 @@
 <resources>
 
     <string name="app_name">Sunshine</string>
-    <string name="action_settings">Settings</string>
+
+    <!-- Menu option labels -->
     <string name="action_refresh" translatable="false">Refresh!</string>
-    <string name="title_activity_detail">DetailActivity</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+
+    <!-- Activity labels -->
+    <string name="title_activity_detail">Details</string>
+
+    <!-- Preferences -->
+    <string name="pref_location_label">Location</string>
+    <string name="pref_location_key" translatable="false">location</string>
+    <string name="pref_location_value" translatable="false">94043</string>
+
+
+
+    <string name="hello_world">Hello World!</string>
 
 </resources>

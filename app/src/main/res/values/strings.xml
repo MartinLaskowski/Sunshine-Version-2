@@ -1,22 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="hello_world">Hello World!</string>
 
     <string name="app_name">Sunshine</string>
 
-    <!-- Menu option labels -->
+    <!-- Menu Option Labels -->
     <string name="action_refresh" translatable="false">Refresh!</string>
     <string name="action_settings">Settings</string>
 
     <!-- Activity labels -->
     <string name="title_activity_detail">Details</string>
 
-    <!-- Preferences -->
+    <!-- Preference Labels, Keys and Values -->
     <string name="pref_location_label">Location</string>
     <string name="pref_location_key" translatable="false">location</string>
     <string name="pref_location_value" translatable="false">90210</string>
+    <string name="pref_location_default" translatable="false">94034</string>
 
+    <string name="pref_units_label">Units</string>
+    <string name="pref_units_key" translatable="false">units</string>
+    <string name="pref_units_heading_instruction">Choose temperature units …</string>
+    <string-array name="pref_units_list_titles">
+        <item>Celsius °C</item>
+        <item>Fahrenheit °F</item>
+    </string-array>
+    <string-array name="pref_units_list_values">
+        <item>1</item>
+        <item>0</item>
+    </string-array>
 
-    <string name="hello_world">Hello World!</string>
-    <string name="pref_location_default">94034</string>
 
 </resources>

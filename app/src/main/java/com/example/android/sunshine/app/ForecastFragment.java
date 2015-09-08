@@ -31,8 +31,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 
 public class ForecastFragment extends Fragment {
@@ -63,7 +61,6 @@ public class ForecastFragment extends Fragment {
             updateWeather();
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -71,24 +68,12 @@ public class ForecastFragment extends Fragment {
     public View onCreateView(
             LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        // TODO delete this fake data generator when network data call works
-        String[] fakeForecastDataArray = {
-                "Today - Sunny - 88 / 63",
-                "Tomorrow - Foggy - 70 / 46",
-                "Weds - Cloudy - 72 / 63",
-                "Thurs - Rainy - 64 / 51",
-                "Fri - Foggy - 70 / 46",
-                "Sat - Sunny - 76 - 68"
-        };
-
-        List<String> weekForecast = new ArrayList<String>(Arrays.asList(fakeForecastDataArray));
-
         mForecastAdapter = // Instantiates mForecastAdapter and populates with our weekForecast
                 new ArrayAdapter<String>(
                         getActivity(), // The current context (this here activity)
                         R.layout.list_item_forecast, // The ID of the layout
                         R.id.list_item_forecast_textview, // The ID of the textView to populate
-                        weekForecast); // the data array
+                        new ArrayList<String>()); // the data array
 
         View rootView = inflater.inflate(
                 R.layout.fragment_main, // parses to the XML dom node describing view hierarchy

@@ -110,8 +110,6 @@ public class ForecastFragment extends Fragment {
                         .putExtra(Intent.EXTRA_TEXT, dailyForecastSnippet);
 
                 startActivity(launchDetailActivityIntent);
-
-//                Toast.makeText(getActivity(), dailyForecastSnippet, Toast.LENGTH_SHORT).show();
             }
         });
     return rootView; // returns the completed, populated rootView

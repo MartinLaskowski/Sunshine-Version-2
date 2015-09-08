@@ -2,6 +2,8 @@
 package com.example.android.sunshine.app;
 
 // Import statements make other packages, classes or interfaces available to this piece of code (which in turn becomes a new class or interface)
+
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
@@ -31,12 +33,10 @@ public class MainActivity extends ActionBarActivity { // We add an ActionBar to 
     public boolean onOptionsItemSelected(MenuItem item) { // handler for when an action bar item is clicked. The action bar automatically handles clicks on the Home/Up button so long as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId(); // gets the id of the selected item
 
-        //noinspection SimplifiableIfStatement  // <-- this comment is system generated and means 'careful: this could be simplified to "return id == R.id.action_settings" unless you put something in the 'if' later, e.g. launch a Settings activity'
-        if (id == R.id.action_settings) {  // 'action-settings' is the name of the first menu item in our menu
+        if (id == R.id.action_settings) {
+            startActivity(new Intent(this, SettingsActivity.class)); // create a new intent that starts SettingsActivity
             return true;
         }
-        // the can presumably be other if statements here testing for other menu items we create
-
         return super.onOptionsItemSelected(item); // return the id of the item selected
     }
 }

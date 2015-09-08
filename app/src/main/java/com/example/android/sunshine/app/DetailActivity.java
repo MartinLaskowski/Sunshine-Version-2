@@ -36,8 +36,9 @@ public class DetailActivity extends ActionBarActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
+        // create intent that starts SettingsActivity
         if (id == R.id.action_settings) {
+            startActivity(new Intent(this, SettingsActivity.class)); // create a new intent that starts SettingsActivity
             return true;
         }
 

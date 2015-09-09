@@ -4,12 +4,18 @@ package com.example.android.sunshine.app;
 // Import statements make other packages, classes or interfaces available to this piece of code (which in turn becomes a new class or interface)
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 public class MainActivity extends ActionBarActivity { // We add an ActionBar to our activity (from API 7 or higher) by extending the now deprecated ActionBarActivity and setting the activity theme to Theme.AppCompat or similar.
+;
+    private final String LOG_TAG = MainActivity.class.getSimpleName();
 
     @Override // most initialization should occur in our onCreate ..
     protected void onCreate(Bundle savedInstanceState) { // the bundle savedInstanceState contains data saved with onSaveInstanceState(Bundle) when the activity last shut down, or is null
@@ -21,7 +27,6 @@ public class MainActivity extends ActionBarActivity { // We add an ActionBar to 
                     .commit(); // commit the change (as changes are batched until committed)
         }
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {  // inflates our options menu from menu.xml and adds it's items to the action bar
@@ -37,6 +42,36 @@ public class MainActivity extends ActionBarActivity { // We add an ActionBar to 
             startActivity(new Intent(this, SettingsActivity.class)); // create a new intent that starts SettingsActivity
             return true;
         }
+        if (id == R.id.action_show_map) {
+            openPreferredLocationInMap(); // run openPreferredLocationMap();
+        }
         return super.onOptionsItemSelected(item); // return the id of the item selected
+    }
+
+    private void openPreferredLocationInMap() {
+
+        // get our SharedPreferences
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        // get our location (or default)
+        String location = sharedPrefs.getString(
+                getString(R.string.pref_location_key),
+                getString(R.string.pref_location_default));
+
+        // make a new Uri build upon location (which is a zip code)
+        Uri geoLocation = Uri.parse("geo:0,0?").buildUpon()
+                .appendQueryParameter("q", location)
+                .build();
+
+        // create intent to show a map
+        Intent showMapInent = new Intent(Intent.ACTION_VIEW);
+        showMapInent.setData(geoLocation); // set its data to be our geoLocation
+
+        // check if intent can be resolved
+        if (showMapInent.resolveActivity(getPackageManager()) != null ) {
+            startActivity(showMapInent); // if yes, start the intent
+        } else { // else log an error
+            Log.d(LOG_TAG, "Couldn't call " + location + "no receiveing apps installed!");
+        }
     }
 }

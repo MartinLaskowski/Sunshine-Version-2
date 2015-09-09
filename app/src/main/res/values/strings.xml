@@ -1,9 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!-- App label -->
     <string name="app_name">Sunshine</string>
 
+
+    <!-- Menu Option Labels -->
+    <string name="action_refresh" translatable="false">Refresh!</string>
+    <string name="action_show_map">Show Map</string>
     <string name="action_settings">Settings</string>
+
+
+    <!-- Activity labels -->
+    <string name="title_activity_detail">Details</string>
+
 
     <!-- Preference Labels, Keys and Values -->
     <!-- Label for location preference [CHAR LIMIT=30] -->
@@ -21,9 +31,6 @@
     <!-- Label for metric option in temperature unit preference [CHAR LIMIT=25] -->
     <string name="pref_units_label_metric">Metric</string>
 
-    <!-- Menu Option Labels -->
-    <string name="action_refresh" translatable="false">Refresh!</string>
-
     <!-- Label for imperial option in temperature unit preference [CHAR LIMIT=25] -->
     <string name="pref_units_label_imperial">Imperial</string>
 
@@ -36,12 +43,8 @@
     <!-- Value in SharedPreferences for imperial temperature unit option [CHAR LIMIT=NONE] -->
     <string name="pref_units_imperial" translatable="false">imperial</string>
 
-    <!-- Activity labels -->
-    <string name="title_activity_detail">Details</string>
 
-
-
-
+    <!--Arrays -->
     <string-array name="pref_units_values">
         <item>@string/pref_units_metric</item>
         <item>@string/pref_units_imperial</item>

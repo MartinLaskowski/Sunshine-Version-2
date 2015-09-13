@@ -1,18 +1,3 @@
-/*
- * Copyright (C) 2014 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.example.android.sunshine.app.data;
 
 import android.content.Context;
@@ -22,13 +7,10 @@ import android.database.sqlite.SQLiteOpenHelper;
 import com.example.android.sunshine.app.data.WeatherContract.LocationEntry;
 import com.example.android.sunshine.app.data.WeatherContract.WeatherEntry;
 
-/**
- * Manages a local database for weather data.
- */
+// manages local weather.db database
 public class WeatherDbHelper extends SQLiteOpenHelper {
 
-    // If you change the database schema, you must increment the database version.
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 2; // change db schema? increment db version
 
     static final String DATABASE_NAME = "weather.db";
 
@@ -38,16 +20,12 @@ public class WeatherDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        final String SQL_CREATE_WEATHER_TABLE = "CREATE TABLE " + WeatherEntry.TABLE_NAME + " (" +
-                // Why AutoIncrement here, and not above?
-                // Unique keys will be auto-generated in either case.  But for weather
-                // forecasting, it's reasonable to assume the user will want information
-                // for a certain date and all dates *following*, so the forecast data
-                // should be sorted accordingly.
-                WeatherEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
 
-                // the ID of the location entry associated with this weather data
-                WeatherEntry.COLUMN_LOC_KEY + " INTEGER NOT NULL, " +
+        final String SQL_CREATE_WEATHER_TABLE = "CREATE TABLE " + WeatherEntry.TABLE_NAME + " (" + // create Weather table
+
+                WeatherEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + // auto-increment so sequential days are easy to work with
+
+                WeatherEntry.COLUMN_LOC_KEY + " INTEGER NOT NULL, " + // ID of Location foreign key
                 WeatherEntry.COLUMN_DATE + " INTEGER NOT NULL, " +
                 WeatherEntry.COLUMN_SHORT_DESC + " TEXT NOT NULL, " +
                 WeatherEntry.COLUMN_WEATHER_ID + " INTEGER NOT NULL," +
@@ -60,26 +38,19 @@ public class WeatherDbHelper extends SQLiteOpenHelper {
                 WeatherEntry.COLUMN_WIND_SPEED + " REAL NOT NULL, " +
                 WeatherEntry.COLUMN_DEGREES + " REAL NOT NULL, " +
 
-                // Set up the location column as a foreign key to location table.
-                " FOREIGN KEY (" + WeatherEntry.COLUMN_LOC_KEY + ") REFERENCES " +
+                " FOREIGN KEY (" + WeatherEntry.COLUMN_LOC_KEY + ") REFERENCES " + // Set up foreign key
                 LocationEntry.TABLE_NAME + " (" + LocationEntry._ID + "), " +
 
-                // To assure the application have just one weather entry per day
-                // per location, it's created a UNIQUE constraint with REPLACE strategy
-                " UNIQUE (" + WeatherEntry.COLUMN_DATE + ", " +
+                " UNIQUE (" + WeatherEntry.COLUMN_DATE + ", " + // create UNIQUE constraint with REPLACE strategy so app has one weather entry per day per location
                 WeatherEntry.COLUMN_LOC_KEY + ") ON CONFLICT REPLACE);";
 
-        sqLiteDatabase.execSQL(SQL_CREATE_WEATHER_TABLE);
+        sqLiteDatabase.execSQL(SQL_CREATE_WEATHER_TABLE); // execute this long-ass statement we just created!
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
-        // This database is only a cache for online data, so its upgrade policy is
-        // to simply to discard the data and start over
-        // Note that this only fires if you change the version number for your database.
-        // It does NOT depend on the version number for your application.
-        // If you want to update the schema without wiping data, commenting out the next 2 lines
-        // should be your top priority before modifying this method.
+        // Only fires if db version number changes. Upgrade policy is to just discard data and start over.
+        // If we want to update schema without wiping data, comment out these next 2 lines
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + LocationEntry.TABLE_NAME);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + WeatherEntry.TABLE_NAME);
         onCreate(sqLiteDatabase);

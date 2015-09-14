@@ -21,6 +21,19 @@ public class WeatherDbHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
 
+        final String SQL_CREATE_LOCATION_TABLE = "CREATE TABLE " + LocationEntry.TABLE_NAME + " (" + // create Location table
+
+                LocationEntry._ID + " INTEGER PRIMARY KEY, " + // ID system generated using BaseColumns in WeatherContract
+
+                LocationEntry.COLUMN_LOCATION_SETTING + " TEXT UNIQUE NOT NULL, " + //  make location setting a unique field
+                LocationEntry.COLUMN_CITY_NAME + " TEXT NOT NULL, " +
+                LocationEntry.COLUMN_COORD_LAT + " REAL NOT NULL, " +
+                LocationEntry.COLUMN_COORD_LONG + " REAL NOT NULL " +
+                ");";
+        
+        // Log.v("statement", "Our SQL_CREATE_LOCATION_TABLE statement looks like this: " + SQL_CREATE_LOCATION_TABLE);
+        sqLiteDatabase.execSQL(SQL_CREATE_LOCATION_TABLE); // execute our new table-creation statement!
+
         final String SQL_CREATE_WEATHER_TABLE = "CREATE TABLE " + WeatherEntry.TABLE_NAME + " (" + // create Weather table
 
                 WeatherEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + // auto-increment so sequential days are easy to work with
@@ -44,7 +57,7 @@ public class WeatherDbHelper extends SQLiteOpenHelper {
                 " UNIQUE (" + WeatherEntry.COLUMN_DATE + ", " + // create UNIQUE constraint with REPLACE strategy so app has one weather entry per day per location
                 WeatherEntry.COLUMN_LOC_KEY + ") ON CONFLICT REPLACE);";
 
-        sqLiteDatabase.execSQL(SQL_CREATE_WEATHER_TABLE); // execute this long-ass statement we just created!
+        sqLiteDatabase.execSQL(SQL_CREATE_WEATHER_TABLE); // execute our other new long-ass table-creation statement! :)
     }
 
     @Override

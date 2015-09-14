@@ -2,13 +2,9 @@ package com.example.android.sunshine.app;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
-import android.text.format.Time;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,17 +16,6 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 
@@ -104,7 +89,7 @@ public class ForecastFragment extends Fragment {
     }
 
     public void updateWeather () {
-        FetchWeatherTask weatherTask = new FetchWeatherTask();
+        FetchWeatherTask weatherTask = new FetchWeatherTask(getActivity(), mForecastAdapter);
 
         // get Shared Preferences
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
@@ -120,218 +105,5 @@ public class ForecastFragment extends Fragment {
     public void onStart() {
         super.onStart();
         updateWeather();
-    }
-
-    public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
-
-        private final String LOG_TAG = FetchWeatherTask.class.getSimpleName();
-
-        // The date/time conversion code is going to be moved outside the asynctask later,
-        // so for convenience we're breaking it out into its own method now.
-        private String getReadableDateString(long time){
-            // Because the API returns a unix timestamp (measured in seconds),
-            // it must be converted to milliseconds in order to be converted to valid date.
-            SimpleDateFormat shortenedDateFormat = new SimpleDateFormat("EEE MMM dd");
-            return shortenedDateFormat.format(time);
-        }
-
-        // Prepare the weather high/lows for presentation.
-        private String formatHighLows(double high, double low, String unitType) {
-
-            if (unitType.equals(getString(R.string.pref_units_imperial))) {
-                high = (high * 1.8) + 32;
-                low = (low * 1.8) + 32;
-            } else if (!unitType.equals(getString(R.string.pref_units_metric))) {
-                Log.e(LOG_TAG, "Unit Type not found: " + unitType);
-            }
-
-            long roundedHigh = Math.round(high);
-            long roundedLow = Math.round(low);
-
-            String highLowStr = roundedHigh + "/" + roundedLow;
-            return highLowStr;
-        }
-
-        // Take the String representing the complete forecast in JSON Format and pull out the data
-        // we need to construct the Strings needed for the wireframes. Fortunately parsing is easy:
-        // constructor takes the JSON string and converts it into an Object hierarchy for us.
-        private String[] getWeatherDataFromJson(String forecastJsonStr, int numDays)
-                throws JSONException {
-
-            // Names of JSON objects that need to be extracted.
-            final String OWM_LIST = "list";
-            final String OWM_WEATHER = "weather";
-            final String OWM_TEMPERATURE = "temp";
-            final String OWM_MAX = "max";
-            final String OWM_MIN = "min";
-            final String OWM_DESCRIPTION = "main";
-
-            JSONObject forecastJson = new JSONObject(forecastJsonStr);
-            JSONArray weatherArray = forecastJson.getJSONArray(OWM_LIST);
-
-            // OWM returns daily forecasts based upon the local time of the requested city, which
-            // means we need to know the GMT offset to translate this data properly. Since this data
-            // is also sent in-order and the first day is always the current day, we're going to
-            // take advantage of that to get a nice normalized UTC date for all of our weather.
-            Time dayTime = new Time();
-            dayTime.setToNow();
-
-            // we start at the day returned by local time. Otherwise this is a mess.
-            int julianStartDay = Time.getJulianDay(System.currentTimeMillis(), dayTime.gmtoff);
-
-            dayTime = new Time();       // now we work exclusively in UTC
-
-            String[] resultStrs = new String[numDays];
-
-            SharedPreferences sharedPrefs =
-                    PreferenceManager.getDefaultSharedPreferences(getActivity());
-            String unitType = sharedPrefs.getString(
-                    getString(R.string.pref_units_key),
-                    getString(R.string.pref_units_metric));
-
-            for(int i = 0; i < weatherArray.length(); i++) {
-                // For now, using the format "Day, description, hi/low"
-                String day;
-                String description;
-                String highAndLow;
-
-                // Get the JSON object representing the day
-                JSONObject dayForecast = weatherArray.getJSONObject(i);
-
-                // The date/time is returned as a long. We now convert it into something human-
-                // readable, since most people won't read "1400356800" as "this saturday"
-                long dateTime;
-
-                // Cheating to convert this to UTC time, which is what we want anyhow
-                dateTime = dayTime.setJulianDay(julianStartDay+i);
-                day = getReadableDateString(dateTime);
-
-                // description is in a child array called "weather" which is 1 element long
-                JSONObject weatherObject = dayForecast.getJSONArray(OWM_WEATHER).getJSONObject(0);
-                description = weatherObject.getString(OWM_DESCRIPTION);
-
-                // Temperatures are in a child object called "temp".  Try not to name variables
-                // "temp" when working with temperature. It confuses everybody
-                JSONObject temperatureObject = dayForecast.getJSONObject(OWM_TEMPERATURE);
-                double high = temperatureObject.getDouble(OWM_MAX);
-                double low = temperatureObject.getDouble(OWM_MIN);
-
-                highAndLow = formatHighLows(high, low, unitType);
-                resultStrs[i] = day + " - " + description + " - " + highAndLow;
-            }
-//  for (String s : resultStrs) { Log.v(LOG_TAG, "Forecast entry: " + s); }
-            return resultStrs;
-        }
-
-        // Create an String[] on a background thread and publish it when assembled to our UI thread.
-        // The '...' ellipses passed in the method signature are varargs and mean the method can
-        // take any number of objects of type String. Varargs must be in the final argument position
-        // and the 'params' means that the final argument may be passed as an array of Strings or as
-        // a sequence of parameters.
-        @Override
-        public String[] doInBackground(String... params) {
-
-            if (params.length == 0) { // No zip code, nothing to look up - verify size of params
-                return null;
-            }
-
-            HttpURLConnection urlConnection = null; // Declaring these here outside the try/catch ..
-            BufferedReader reader = null; // ... so they can be closed in the 'finally' block
-
-            String forecastJsonStr = null; // Will contain the raw JSON response as a string
-
-            // Set up variables for our Uri.Builder
-            String format = "json";
-            String units = "metric";
-            int numDays = 7;
-
-            try { // Construct OWM URL query. Possible params at openweathermap.org/API#forecast
-                final String FORECAST_BASE_URL = // sets the base URL to a String
-                        "http://api.openweathermap.org/data/2.5/forecast/daily?";
-
-                // sets up the 4 variable URL components as String variables
-                final String QUERY_PARAM = "q";
-                final String FORMAT_PARAM = "mode";
-                final String UNITS_PARAM = "units";
-                final String DAYS_PARAM = "cnt";
-
-                // builds the URL
-                Uri builtUri = Uri.parse(FORECAST_BASE_URL).buildUpon()
-                        .appendQueryParameter(QUERY_PARAM, params[0])
-                        .appendQueryParameter(FORMAT_PARAM, format)
-                        .appendQueryParameter(UNITS_PARAM, units)
-                        .appendQueryParameter(DAYS_PARAM, Integer.toString(numDays))
-                        .build();
-
-                // commits the built URL to a new URL variable called URL
-                URL url = new URL (builtUri.toString());
-//  Log.v(LOG_TAG, "Built URI is:" + url); // logs the URL string we built
-
-                // Create the request to OpenWeatherMap, and open the connection
-                urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setRequestMethod("GET");
-                urlConnection.connect();
-
-                // Read the input stream into a String
-                InputStream inputStream = urlConnection.getInputStream();
-                StringBuffer buffer = new StringBuffer(); // data added line-by-line by while below
-                if (inputStream == null) { // if URL returned empty string, quit and return null
-                    return null;
-                }
-
-                // puts the content of the inputStream into variable 'reader'
-                reader = new BufferedReader(new InputStreamReader(inputStream));
-
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
-                    // But it does make debugging a *lot* easier if you print out the completed
-                    // buffer for debugging
-                    buffer.append(line + "\n");
-                }
-
-                if (buffer.length() == 0) { // If stream is empty, no point in parsing
-                    return null;
-                }
-                forecastJsonStr = buffer.toString(); // our ready data!!
-//  Log.v(LOG_TAG, "Forecast JSON String: " + forecastJsonStr); // logs our new data
-
-            } catch (IOException e) { // If weather data fetch failed there's no point in parsing
-                Log.e(LOG_TAG, "Error ", e);
-                return null;
-            }
-
-            finally { // kill the connection
-                if (urlConnection != null) {
-                    urlConnection.disconnect();
-                }
-                if (reader != null) { // close the reader
-                    try {
-                        reader.close();
-                    } catch (final IOException e) { // log errors in closing stream
-                        Log.e(LOG_TAG, "Error closing stream", e);
-                    }
-                }
-            }
-
-            try {
-                return getWeatherDataFromJson(forecastJsonStr, numDays);
-            }
-            catch (JSONException e) { // Log errors getting or parsing the forecast
-                Log.e(LOG_TAG, e.getMessage(), e);
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-        @Override // Once data is got and parsed, clear mForecastAdapter and add data to it
-        protected void onPostExecute(String[] result) {
-            if ( result != null) {
-                mForecastAdapter.clear();
-                for (String dayForecastStr : result) {
-                    mForecastAdapter.add(dayForecastStr);
-                }
-            }
-        }
     }
 }

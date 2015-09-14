@@ -30,7 +30,7 @@ public class WeatherDbHelper extends SQLiteOpenHelper {
                 LocationEntry.COLUMN_COORD_LAT + " REAL NOT NULL, " +
                 LocationEntry.COLUMN_COORD_LONG + " REAL NOT NULL " +
                 ");";
-        
+
         // Log.v("statement", "Our SQL_CREATE_LOCATION_TABLE statement looks like this: " + SQL_CREATE_LOCATION_TABLE);
         sqLiteDatabase.execSQL(SQL_CREATE_LOCATION_TABLE); // execute our new table-creation statement!
 
@@ -63,7 +63,8 @@ public class WeatherDbHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
         // Only fires if db version number changes. Upgrade policy is to just discard data and start over.
-        // If we want to update schema without wiping data, comment out these next 2 lines
+        // If we want to update schema without wiping data, comment out these next 2 lines.
+        // Also, to preserve data during upgrade, we'd likely use ALTER COLUMNS and ALTER TABLE :)
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + LocationEntry.TABLE_NAME);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + WeatherEntry.TABLE_NAME);
         onCreate(sqLiteDatabase);

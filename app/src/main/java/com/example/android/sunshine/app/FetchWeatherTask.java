@@ -18,6 +18,7 @@ package com.example.android.sunshine.app;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
@@ -25,6 +26,7 @@ import android.text.format.Time;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 
+import com.example.android.sunshine.app.data.WeatherContract;
 import com.example.android.sunshine.app.data.WeatherContract.WeatherEntry;
 
 import org.json.JSONArray;
@@ -106,7 +108,27 @@ public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
      * @return the row ID of the added location.
      */
     long addLocation(String locationSetting, String cityName, double lat, double lon) {
-        // Students: First, check if the location with this city name exists in the db
+        long locationID;
+
+        // First, check if the location with this city name exists in the db
+        Cursor locationCursor = mContext.getContentResolver().query(
+                WeatherContract.LocationEntry.CONTENT_URI,
+                new String[]{WeatherContract.LocationEntry._ID},
+                WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING + " = ? ",
+                new String[]{locationSetting},
+                null);
+
+        if ( locationCursor.moveToFirst()) {
+            int locationIDIndex = locationCursor.getColumnIndex(WeatherContract.LocationEntry._ID);
+            locationID = locationCursor.getLong(locationIDIndex);
+        } else {
+            // now that our content provider is set up, inserting rows of data is simple.
+            // first create a ContentValues object to the data we want to insert
+            ContentValues locationValues = new ContentValues();
+
+        }
+
+
         // If it exists, return the current ID
         // Otherwise, insert it using the content resolver and the base URI
         return -1;
@@ -369,7 +391,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
             forecastJsonStr = buffer.toString();
         } catch (IOException e) {
             Log.e(LOG_TAG, "Error ", e);
-            // If the code didn't successfully get the weather data, there's no point in attemping
+            // If the code didn't successfully get the weather data, there's no point in attempting
             // to parse it.
             return null;
         } finally {

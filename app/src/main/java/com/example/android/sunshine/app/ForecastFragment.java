@@ -18,7 +18,6 @@ import android.widget.ListView;
 
 import java.util.ArrayList;
 
-
 public class ForecastFragment extends Fragment {
 
     public ArrayAdapter<String> mForecastAdapter;

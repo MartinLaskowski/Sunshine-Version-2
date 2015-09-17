@@ -7,10 +7,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 import com.example.android.sunshine.app.data.WeatherContract.LocationEntry;
 import com.example.android.sunshine.app.data.WeatherContract.WeatherEntry;
 
-// manages local weather.db database
 public class WeatherDbHelper extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 2; // change db schema? increment db version
+    private static final int DATABASE_VERSION = 2; // increment when schema changes
 
     static final String DATABASE_NAME = "weather.db";
 

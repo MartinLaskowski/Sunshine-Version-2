@@ -1,24 +1,10 @@
-/*
- * Copyright (C) 2014 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.example.android.sunshine.app;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
@@ -57,20 +43,13 @@ public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
 
     private boolean DEBUG = true;
 
-    /* The date/time conversion code is going to be moved outside the asynctask later,
-     * so for convenience we're breaking it out into its own method now.
-     */
     private String getReadableDateString(long time){
-        // Because the API returns a unix timestamp (measured in seconds),
-        // it must be converted to milliseconds in order to be converted to valid date.
+        // Because the API returns a unix timestamp (measured in seconds), it must be converted to milliseconds in order to be converted to valid date.
         Date date = new Date(time);
         SimpleDateFormat format = new SimpleDateFormat("E, MMM d");
         return format.format(date).toString();
     }
 
-    /**
-     * Prepare the weather high/lows for presentation.
-     */
     private String formatHighLows(double high, double low) {
         // Data is fetched in Celsius by default.
         // If user prefers to see in Fahrenheit, convert the values here.
@@ -98,14 +77,12 @@ public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
         return highLowStr;
     }
 
-    /**
-     * Helper method to handle insertion of a new location in the weather database.
-     *
-     * @param locationSetting The location string used to request updates from the server.
+    /** Helper method to handle insertion of a new location in the weather database
+     * @param locationSetting The location string used to request updates from the server
      * @param cityName A human-readable city name, e.g "Mountain View"
      * @param lat the latitude of the city
      * @param lon the longitude of the city
-     * @return the row ID of the added location.
+     * @return the row ID of the added location
      */
     long addLocation(String locationSetting, String cityName, double lat, double lon) {
         long locationID;
@@ -127,18 +104,11 @@ public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
             ContentValues locationValues = new ContentValues();
 
         }
-
-
-        // If it exists, return the current ID
-        // Otherwise, insert it using the content resolver and the base URI
+        // If it exists, return the current ID, otherwise, insert it using the content resolver and the base URI
         return -1;
     }
 
-    /*
-        Students: This code will allow the FetchWeatherTask to continue to return the strings that
-        the UX expects so that we can continue to test the application even once we begin using
-        the database.
-     */
+    // This code allow FetchWeatherTask to continue to return the strings that the UX expects so we can continue to test the application even once we begin using the database
     String[] convertContentValuesToUXFormat(Vector<ContentValues> cvv) {
         // return strings to keep UI functional for now
         String[] resultStrs = new String[cvv.size()];
@@ -155,21 +125,12 @@ public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
         return resultStrs;
     }
 
-    /**
-     * Take the String representing the complete forecast in JSON Format and
-     * pull out the data we need to construct the Strings needed for the wireframes.
-     *
-     * Fortunately parsing is easy:  constructor takes the JSON string and converts it
-     * into an Object hierarchy for us.
-     */
+    /** Take the JSON String representing the complete forecast and pull out the data we need to construct Strings with.
+     * Parsing is easy: constructor takes the JSON string and converts it into an Object hierarchy for us. */
     private String[] getWeatherDataFromJson(String forecastJsonStr,
                                             String locationSetting)
             throws JSONException {
-
         // Now we have a String representing the complete forecast in JSON Format.
-        // Fortunately parsing is easy:  constructor takes the JSON string and converts it
-        // into an Object hierarchy for us.
-
         // These are the names of the JSON objects that need to be extracted.
 
         // Location information
@@ -296,18 +257,17 @@ public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
                     locationSetting, System.currentTimeMillis());
 
             // Students: Uncomment the next lines to display what what you stored in the bulkInsert
+            Cursor cur = mContext.getContentResolver().query(weatherForLocationUri,
+                    null, null, null, sortOrder);
 
-//            Cursor cur = mContext.getContentResolver().query(weatherForLocationUri,
-//                    null, null, null, sortOrder);
-//
-//            cVVector = new Vector<ContentValues>(cur.getCount());
-//            if ( cur.moveToFirst() ) {
-//                do {
-//                    ContentValues cv = new ContentValues();
-//                    DatabaseUtils.cursorRowToContentValues(cur, cv);
-//                    cVVector.add(cv);
-//                } while (cur.moveToNext());
-//            }
+            cVVector = new Vector<ContentValues>(cur.getCount());
+            if ( cur.moveToFirst() ) {
+                do {
+                    ContentValues cv = new ContentValues();
+                    DatabaseUtils.cursorRowToContentValues(cur, cv);
+                    cVVector.add(cv);
+                } while (cur.moveToNext());
+            }
 
             Log.d(LOG_TAG, "FetchWeatherTask Complete. " + cVVector.size() + " Inserted");
 

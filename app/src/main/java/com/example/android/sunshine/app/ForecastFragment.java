@@ -1,9 +1,8 @@
 package com.example.android.sunshine.app;
 
-import android.content.Intent;
-import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -11,16 +10,16 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import java.util.ArrayList;
+import com.example.android.sunshine.app.data.WeatherContract;
 
+/**
+ * Encapsulates fetching the forecast and displaying it as a {@link ListView} layout.
+ */
 public class ForecastFragment extends Fragment {
 
-    public ArrayAdapter<String> mForecastAdapter;
+    private ForecastAdapter mForecastAdapter;
 
     public ForecastFragment() {
     }
@@ -28,7 +27,8 @@ public class ForecastFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true); // Must be true for this fragment to handle menu events
+        // Add this line in order for this fragment to handle menu events.
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -36,11 +36,11 @@ public class ForecastFragment extends Fragment {
         inflater.inflate(R.menu.forecastfragment, menu);
     }
 
-    // Handle action bar item clicks. The Action bar automatically handles clicks on the Home/Up
-    // button as long as you specify a parent activity in AndroidManifest.xml.
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_refresh) {
             updateWeather();
@@ -49,54 +49,36 @@ public class ForecastFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
-    @Override // Creates and returns the view hierarchy associated with the fragment
-    public View onCreateView(
-            LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        String locationSetting = Utility.getPreferredLocation(getActivity());
 
-        mForecastAdapter = // Instantiates mForecastAdapter and populates with our weekForecast
-                new ArrayAdapter<String>(
-                        getActivity(), // The current context (this here activity)
-                        R.layout.list_item_forecast, // The ID of the layout
-                        R.id.list_item_forecast_textview, // The ID of the textView to populate
-                        new ArrayList<String>()); // the data array
+        // Sort order:  Ascending, by date.
+        String sortOrder = WeatherContract.WeatherEntry.COLUMN_DATE + " ASC";
+        Uri weatherForLocationUri = WeatherContract.WeatherEntry.buildWeatherLocationWithStartDate(
+                locationSetting, System.currentTimeMillis());
 
-        View rootView = inflater.inflate(
-                R.layout.fragment_main, // parses to the XML dom node describing view hierarchy
-                container, // root: parent of generated hierarchy if attachToRoot = true, else ..
-                false); // attachToRoot: .. if false, container just subclasses LayoutParams for XML
+        Cursor cur = getActivity().getContentResolver().query(weatherForLocationUri,
+                null, null, null, sortOrder);
 
-        final ListView listView = (ListView) rootView.findViewById(R.id.list_view_forecast);
+        // The CursorAdapter will take data from our cursor and populate the ListView
+        // However, we cannot use FLAG_AUTO_REQUERY since it is deprecated, so we will end
+        // up with an empty list the first time we run.
+        mForecastAdapter = new ForecastAdapter(getActivity(), cur, 0);
 
-        listView.setAdapter(mForecastAdapter); // sets our ArrayAdapter onto the listView!!!
+        View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        // add list item click listener
-        listView.setOnItemClickListener(new OnItemClickListener() {
+        // Get a reference to the ListView, and attach this adapter to it.
+        ListView listView = (ListView) rootView.findViewById(R.id.list_view_forecast);
+        listView.setAdapter(mForecastAdapter);
 
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-
-                String dailyForecastSnippet = mForecastAdapter.getItem(position);
-
-                // create intent that starts DetailActivity
-                Intent launchDetailActivityIntent = new Intent(getActivity(), DetailActivity.class)
-                        .putExtra(Intent.EXTRA_TEXT, dailyForecastSnippet);
-
-                startActivity(launchDetailActivityIntent);
-            }
-        });
-        return rootView; // returns the completed, populated rootView
+        return rootView;
     }
 
-    public void updateWeather () {
-        FetchWeatherTask weatherTask = new FetchWeatherTask(getActivity(), mForecastAdapter);
-
-        // get Shared Preferences
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
-
-        // get location from Preferences
-        String location = sharedPref.getString(getString(R.string.pref_location_key),
-                getString(R.string.pref_location_default));
-
+    private void updateWeather() {
+        FetchWeatherTask weatherTask = new FetchWeatherTask(getActivity());
+        String location = Utility.getPreferredLocation(getActivity());
         weatherTask.execute(location);
     }
 

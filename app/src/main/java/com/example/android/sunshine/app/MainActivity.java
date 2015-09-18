@@ -1,10 +1,8 @@
 package com.example.android.sunshine.app;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -46,14 +44,7 @@ public class MainActivity extends ActionBarActivity { // We add an ActionBar to 
     }
 
     private void openPreferredLocationInMap() {
-
-        // get our SharedPreferences
-        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-
-        // get our location (or default)
-        String location = sharedPrefs.getString(
-                getString(R.string.pref_location_key),
-                getString(R.string.pref_location_default));
+        String location = Utility.getPreferredLocation(this);
 
         // make a new Uri built upon location (which is a zip code)
         Uri geoLocation = Uri.parse("geo:0,0?").buildUpon()
